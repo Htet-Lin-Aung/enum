@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Enums\ProductStatusEnum;
-  
+use App\Http\Requests\ProductStoreRequest;
+
 class ProductController extends Controller
 {
     /**
@@ -15,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        $products = Product::paginate(10);
 
         return view('products.index', compact('products'));
     }
@@ -36,22 +37,13 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductStoreRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'body' => 'required',
-            'status' => 'required|in:pending,active,inactive,rejected'
-        ]);
+        $validatedData = $request->validated();
 
-        $product = Product::create([
-            'name' => $request->name,
-            'body' => $request->body,
-            'status' => $request->status
-        ]);
+        $product = Product::create($validatedData);
 
-
-        return redirect()->route('products.index');
+        return to_route('products.index');
     }
 
     /**
@@ -62,7 +54,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return view('products.show',compact('product'));
     }
 
     /**
@@ -73,7 +65,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        $statusEnums = ProductStatusEnum::all();
+        return view('products.edit',compact('product','statusEnums'));
     }
 
     /**
@@ -83,9 +76,13 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductStoreRequest $request, Product $product)
     {
-        //
+        $validatedData = $request->validated();
+
+        $product->update($validatedData);
+
+        return to_route('products.index');
     }
 
     /**
@@ -96,6 +93,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        return redirect()->back();
     }
 }

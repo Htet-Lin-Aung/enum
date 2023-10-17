@@ -37,18 +37,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($products as $product)
+                                @foreach ($products as $index => $product)
                                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                     <th scope="row"
                                         class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                                        {{$product->id}}
+                                        {{$index+1}}
                                     </th>
                                     <td class="px-6 py-4">
                                         {{$product->name}}
-
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800">{{ $product->status  }}</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800">{{ $product->status->name  }}</span>
                                     </td>
                                     <td class="px-6 py-4">
                                         <a href="{{ route('products.edit',$product->id) }}">
@@ -72,7 +71,7 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <form action="{{ route('products.destroy',$product->id) }}" method="POST"
-                                            onsubmit="return confirm('{{ trans('are You Sure ? ') }}');"
+                                            onsubmit="return confirm('Are you sure to delete ?');"
                                             style="display: inline-block;">
                                             <input type="hidden" name="_method" value="DELETE">
                                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -85,7 +84,9 @@
                             </tbody>
                         </table>
                     </div>
-
+                    <div class="mt-4">
+                        {{ $products->links() }}
+                    </div>
                 </div>
             </div>
         </div>
